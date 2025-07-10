@@ -1,0 +1,34 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <style>
+    h2 {text-align: center;}
+  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HumorHealer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="background-decor">
+    <img src="images/flowers.png" alt="flowers" class="flowers top right">
+    <img src="images/bird.png" alt="bird" class="birdie">
+  </div>
+
+  <button id="resetBtn">Reset Conversation</button>
+
+  <div id="chat-container">
+    <h1> HumorHealer</h1>
+    <h2> What's on your mind?</h2>
+    <div id="chat"></div>
+    <input type="text" id="userInput" placeholder="Type here..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
