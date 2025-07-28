@@ -1,3 +1,13 @@
+// Function to get or create a unique user ID
+function getUserId() {
+    let userId = localStorage.getItem('userId');
+    if (!userId) {
+        userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('userId', userId);
+    }
+    return userId;
+}
+
 async function sendMessage() {
     const input = document.getElementById('userInput');
     const message = input.value.trim();
@@ -10,7 +20,10 @@ async function sendMessage() {
       const response = await fetch('/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })  // sending to /ask endpoint
+        body: JSON.stringify({ 
+          message,
+          userId: getUserId() 
+        })
       });
   
       if (!response.ok) {
@@ -18,28 +31,32 @@ async function sendMessage() {
       }
   
       const data = await response.json();
-      addMessageToChat('HumorHealer', data.reply); // show bot reply
+      addMessageToChat('HumorHealer', data.reply);
     } catch (error) {
       addMessageToChat('HumorHealer', "Sorry, something went wrong.");
       console.error('Error sending message:', error);
     }
-  }
-  
-  
-  
-  // Helper to add messages to the chat div
-  function addMessageToChat(sender, message) {
+}
+
+// Helper to add messages to the chat div
+function addMessageToChat(sender, message) {
     const chat = document.getElementById('chat');
     const messageElem = document.createElement('p');
     messageElem.innerHTML = `<strong>${sender}:</strong> ${message}`;
     chat.appendChild(messageElem);
-    chat.scrollTop = chat.scrollHeight; // scroll to bottom
-  }
-  
-  //Reset button method
-  document.getElementById('resetBtn').addEventListener('click', async () => {
+    chat.scrollTop = chat.scrollHeight;
+}
+
+// Reset button method - updated to include userId
+document.getElementById('resetBtn').addEventListener('click', async () => {
     try {
-      const response = await fetch('/reset', { method: 'POST' });
+      const response = await fetch('/reset', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          userId: getUserId()  // Added userId here
+        })
+      });
       const data = await response.json();
       alert(data.message || "Conversation reset.");
   
@@ -50,6 +67,26 @@ async function sendMessage() {
       alert('Failed to reset conversation.');
       console.error(error);
     }
-  });
-  
-  
+});
+
+// Optional: Load conversation history when page loads
+async function loadConversationHistory() {
+    try {
+        const response = await fetch(`/history/${getUserId()}`);
+        const data = await response.json();
+        
+        // Display previous messages
+        data.messages.forEach(msg => {
+            const sender = msg.role === 'user' ? 'You' : 'HumorHealer';
+            addMessageToChat(sender, msg.content);
+        });
+        
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
+}
+
+// Load history when page loads
+window.addEventListener('DOMContentLoaded', () => {
+    loadConversationHistory();
+});
