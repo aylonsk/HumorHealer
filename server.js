@@ -142,7 +142,8 @@ app.post('/ask', async (req, res) => {
   
       // Get messages
       const messages = await openai.beta.threads.messages.list(threadId);
-      const assistantReply = messages.data[0].content[0].text.value;
+      const assistantReply = messages.data.find(msg => msg.role === "assistant")?.content[0].text.value || "No assistant response found.";
+
   
       console.log("💬 Assistant reply:", assistantReply);
   
