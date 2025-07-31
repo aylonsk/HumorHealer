@@ -12,31 +12,38 @@ async function sendMessage() {
     const input = document.getElementById('userInput');
     const message = input.value.trim();
     if (!message) return;
-  
+
     addMessageToChat('You', message);
     input.value = '';
-  
+
+    // ✅ Show typing indicator
+    document.getElementById('typing-indicator').style.display = 'block';
+
     try {
-      const response = await fetch('/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message,
-          userId: getUserId() 
-        })
-      });
-  
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-  
-      const data = await response.json();
-      addMessageToChat('HumorHealer', data.reply);
+        const response = await fetch('/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              message,
+              userId: getUserId() 
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+        addMessageToChat('HumorHealer', data.reply);
     } catch (error) {
-      addMessageToChat('HumorHealer', "Sorry, something went wrong.");
-      console.error('Error sending message:', error);
+        addMessageToChat('HumorHealer', "Sorry, something went wrong.");
+        console.error('Error sending message:', error);
+    } finally {
+        // ✅ Hide typing indicator
+        document.getElementById('typing-indicator').style.display = 'none';
     }
 }
+
 
 // Helper to add messages to the chat div
 function addMessageToChat(sender, message) {
@@ -89,4 +96,12 @@ async function loadConversationHistory() {
 // Load history when page loads
 window.addEventListener('DOMContentLoaded', () => {
     loadConversationHistory();
+});
+
+// Allow pressing Enter to send message
+document.getElementById('userInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); // Prevents newline
+        sendMessage();
+    }
 });

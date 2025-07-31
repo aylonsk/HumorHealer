@@ -121,7 +121,19 @@ body {
     background-color: #d32f2f;
   }
   
-
+  #typing-indicator {
+    font-style: italic;
+    color: #6a1b9a;
+    margin-bottom: 1em;
+    animation: blink 1.2s infinite;
+  }
+  
+  @keyframes blink {
+    0% { opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { opacity: 0.2; }
+  }
+  
   
   
   
